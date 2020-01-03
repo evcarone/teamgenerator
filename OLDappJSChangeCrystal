@@ -1,0 +1,183 @@
+const inquirer = require("inquirer");
+const fs = require("fs");
+const util = require("util");
+const axios = require("axios");
+const writeFileAsync = util.promisify(fs.writeFile);
+const answers = []
+
+function promptRole() {
+    return inquirer.prompt([
+        {
+            type: "list",
+            name: "employeeRole",
+            message: "What is the role of the employee?",
+            choices: ["Manager", "Engineer", "Intern"]
+        }
+    ]
+    )}
+
+function promptManager(role) {
+  const prompts = {
+    'Manager': [
+        {
+            type: "input",
+            name: "team",
+            message: "What is the team name?"
+        },
+        {
+            type: "input",
+            name: "role",
+            message: "What is the role of the employee?"
+        },
+        {
+            type: "input",
+            name: "name",
+            message: "What is the name of the employee?"
+        },
+        {
+            type: "number",
+            name: "id",
+            message: "What is the employee ID?"
+        },
+        {
+            type: "input",
+            name: "email",
+            message: "What is the email of the employee?"
+        },
+        {
+            type: "input",
+            name: "office",
+            message: "What is the office number of the manager?"
+        }
+    ],
+    'Engineer': [
+        {
+            type: "input",
+            name: "role",
+            message: "What is the role of the employee?"
+        },
+        {
+            type: "input",
+            name: "name",
+            message: "What is the name of the employee?"
+        },
+        {
+            type: "number",
+            name: "id",
+            message: "What is the employee ID?"
+        },
+        {
+            type: "input",
+            name: "email",
+            message: "What is the email of the employee?"
+        },
+    ],
+    'Intern': [
+        {
+            type: "input",
+            name: "role",
+            message: "What is the role of the employee?"
+        },
+        {
+            type: "input",
+            name: "name",
+            message: "What is the name of the employee?"
+        },
+        {
+            type: "number",
+            name: "id",
+            message: "What is the employee ID?"
+        },
+        {
+            type: "input",
+            name: "email",
+            message: "What is the email of the employee?"
+        },
+    ]
+  }
+  return inquirer.prompt(prompts[role.employeeRole])
+  }
+
+
+function promptChain() {
+  promptRole().then(promptManager).then(handleAnswer).then(promptContinue)
+}
+
+
+function handleAnswer(answer) {
+  answers.push(answer)
+}
+
+function promptContinue() {
+  inquirer.prompt([{
+      type: "list",
+      name: "continue",
+      message: "Keep adding people?",
+      choices: ["Yes", "No"]
+  }]).then(potato => {
+    if (potato.continue === "Yes") {
+      promptChain()
+    } else {
+      createTeamFromTemplate()
+    }
+  })
+}
+promptChain()
+
+function createTeamFromTemplate() {
+  const main = fs.readFileSync('./templates/main.html', {
+      encoding: 'utf8'
+  })
+  const intern = fs.readFileSync('./templates/intern.html', {
+      encoding: 'utf8'
+  })
+
+  answers.map(answer => {
+    switch (answer.role) {
+      case "Engineer":
+          const engineer = fs.readFileSync('./templates/engineer.html', {
+              encoding: 'utf8'
+          })
+          engineer.replace('{{ name }}', answer.name)
+          return engineer
+        break;
+      case "Manager":
+          const manager = fs.readFileSync('./templates/manager.html', {
+              encoding: 'utf8'
+          })
+        break;
+      case "Intern":
+
+        break;
+      default:
+        Throw new Error('bad role')
+    }
+  })
+
+  
+  main.replace('{{ cards }}', answers.join(""))
+
+}
+
+function createManager(empN, empR, empId, empE, empO, teamN) {
+    const templateFile = fs.readFileSync('./templates/main.html', {
+        encoding: 'utf8'
+    })
+
+    let tmpN = empN
+    let tmpR = empR
+    let tmpId = empId
+    let tmpE = empE
+    let tmpO = empO
+    let tmpT = teamN
+
+    let tempFile = templateFile.replace('{{ name }}', tmpN)
+    tempFile = tempFile.replace('{{ role }}', tmpR)
+    tempFile = tempFile.replace('{{ id }}', tmpId)
+    tempFile = tempFile.replace('{{ email }}', tmpE)
+    tempFile = tempFile.replace('{{ email }}', tmpE)
+    tempFile = tempFile.replace('{{ officeNumber }}', tmpO)
+    tempFile = tempFile.replace('{{ team }}', tmpT)
+
+    writeFileAsync("./output/index.html", tempFile)
+}

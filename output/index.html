@@ -16,7 +16,7 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-12 jumbotron mb-3 team-heading">
-                <h1 class="text-center">Super Duper</h1>
+                <h1 class="text-center">{{ team }}</h1>
             </div>
         </div>
     </div>
@@ -24,19 +24,21 @@
     <div class="container">
         <div class="row">
             <div class="team-area col-12 d-flex justify-content-center">
+                
                 <div class="card employee-card">
-                    <div class="card-header">
-                        <h2 class="card-title">EvelynC</h2>
-                        <h3 class="card-title"><i class="fas fa-mug-hot mr-2"></i>Manager</h3>
-                    </div>
-                    <div class="card-body">
-                        <ul class="list-group">
-                            <li class="list-group-item">ID: 12</li>
-                            <li class="list-group-item">Email: <a href="mailto:me@there">me@there</a></li>
-                            <li class="list-group-item">Office number: 12-12</li>
-                        </ul>
-                    </div>
-                </div>
+    <div class="card-header">
+        <h2 class="card-title">Evelyn</h2>
+        <h3 class="card-title"><i class="fas fa-glasses mr-2"></i>{{ role }}</h3>
+    </div>
+    <div class="card-body">
+        <ul class="list-group">
+            <li class="list-group-item">ID: 2</li>
+            <li class="list-group-item">Email: <a href="mailto:{{ email }}">{{ email }}</a></li>
+            <li class="list-group-item">GitHub: <a href="https://github.com/{{ github }}" target="_blank" rel="noopener noreferrer">{{ github }}</a></li>
+        </ul>
+    </div>
+</div>
+                
             </div>
         </div>
     </div>
