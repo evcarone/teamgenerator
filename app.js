@@ -69,6 +69,11 @@ function promptManager(role) {
             },
             {
                 type: "input",
+                name: "github",
+                message: "What is their GitHub?"
+            },
+            {
+                type: "input",
                 name: "email",
                 message: "What is the email of the employee?"
             },
@@ -92,6 +97,11 @@ function promptManager(role) {
                 type: "input",
                 name: "email",
                 message: "What is the email of the employee?"
+            },
+            {
+                type: "input",
+                name: "school",
+                message: "What is the name of the school?"
             },
         ]
     }
@@ -132,14 +142,11 @@ promptChain()
 
 // create team from the template files using the answers gathered during the prompt chain
 function createTeamFromTemplate() {
-      const main = fs.readFileSync('./templates/main.html', {
-          encoding: 'utf8'
-      })
-    // const intern = fs.readFileSync('./templates/intern.html', {
-    //     encoding: 'utf8'
-    // })
+    const main = fs.readFileSync('./templates/main.html', {
+        encoding: 'utf8'
+    })
 
-// in the answers array, for each item in the array the appropriate template is called based on role
+    // in the answers array, for each item in the array the appropriate template is called based on role
     let newArray = answers.map(answer => {
         switch (answer.role) {
             case "Engineer": {
@@ -147,9 +154,13 @@ function createTeamFromTemplate() {
                     encoding: 'utf8'
                 })
 
-                let tempEng = engineer.replace('{{ name }}', answer.name) 
+                let tempEng = engineer.replace('{{ name }}', answer.name)
                 tempEng = tempEng.replace('{{ id }}', answer.id)
-                console.log("inside the case statement for engineer: " + tempEng)
+                tempEng = tempEng.replace('{{ role }}', answer.role)
+                tempEng = tempEng.replace('{{ email }}', answer.email) //first instnace of email
+                tempEng = tempEng.replace('{{ email }}', answer.email) //second instance of email
+                tempEng = tempEng.replace('{{ github }}', answer.github) //first instance of github
+                tempEng = tempEng.replace('{{ github }}', answer.github) //second instance of github
                 return tempEng
                 break;
             }
@@ -157,52 +168,41 @@ function createTeamFromTemplate() {
                 const manager = fs.readFileSync('./templates/manager.html', {
                     encoding: 'utf8'
                 });
-                manager.replace('{{ name }}', answer.name);
-                manager.replace('{{ role }}', answer.role);
-                manager.replace('{{ id }}', answer.id);
-                manager.replace('{{ email }}', answer.email);
-                console.log("inside the case statement for manager: " + manager)
-                return manager;
+                let tempMgr = manager.replace('{{ name }}', answer.name);
+                tempMgr = tempMgr.replace('{{ role }}', answer.role);
+                tempMgr = tempMgr.replace('{{ id }}', answer.id);
+                tempMgr = tempMgr.replace('{{ email }}', answer.email); //first instance of email
+                tempMgr = tempMgr.replace('{{ email }}', answer.email); //second instance of email
+                tempMgr = tempMgr.replace('{{ officeNumber }}', answer.office); //second instance of email
+                return tempMgr;
                 break;
-            // case "Intern":
+            case "Intern": {
+                const intern = fs.readFileSync('./templates/intern.html', {
+                    encoding: 'utf8'
+                })
 
-            //     break;
+                let tempIntern = intern.replace('{{ name }}', answer.name)
+                tempIntern = tempIntern.replace('{{ id }}', answer.id)
+                tempIntern = tempIntern.replace('{{ role }}', answer.role)
+                tempIntern = tempIntern.replace('{{ email }}', answer.email) //first instnace of email
+                tempIntern = tempIntern.replace('{{ email }}', answer.email) //second instance of email
+                tempIntern = tempIntern.replace('{{ school }}', answer.school)
+                return tempIntern
+                break;
+            }
             default:
                 throw new Error('bad role');
-                //   console.log("goodbye")
         }
     })
 
-      
-    //   let tempFile = main.replace('<div> {{ cards }} </div>', answers.join(""))
-      let tempFile = main.replace('<div> {{ cards }} </div>', Object.values(newArray))
+    let tempFile = main.replace('<div> {{ cards }} </div>', Object.values(newArray))
+    const teamIndex = answers.findIndex(element => element = 'manager') // find index where the team name is stored
+    const teamName = answers[teamIndex].team // set the variable equal to the team name
+    console.log("the team name is: " + teamName)
+    tempFile = tempFile.replace('{{ team }}', teamName)
 
-      writeFileAsync("./output/index.html", tempFile)
-      console.log(Object.values(answers))
-      console.log(Object.values(newArray))
+    writeFileAsync("./output/index.html", tempFile)
+    // console.log(Object.values(answers))
+    // console.log(Object.values(newArray))
 
 }
-
-// function createManager(empN, empR, empId, empE, empO, teamN) {
-//     const templateFile = fs.readFileSync('./templates/main.html', {
-//         encoding: 'utf8'
-//     })
-
-//     let tmpN = empN
-//     let tmpR = empR
-//     let tmpId = empId
-//     let tmpE = empE
-//     let tmpO = empO
-//     let tmpT = teamN
-
-//     let tempFile = templateFile.replace('{{ name }}', tmpN)
-//     tempFile = tempFile.replace('{{ role }}', tmpR)
-//     tempFile = tempFile.replace('{{ id }}', tmpId)
-//     tempFile = tempFile.replace('{{ email }}', tmpE)
-//     tempFile = tempFile.replace('{{ email }}', tmpE)
-//     tempFile = tempFile.replace('{{ officeNumber }}', tmpO)
-//     tempFile = tempFile.replace('{{ team }}', tmpT)
-//     console.log('name '+ tmpN)
-
-//     writeFileAsync("./output/index.html", tempFile)
-// }
